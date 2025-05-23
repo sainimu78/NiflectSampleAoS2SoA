@@ -9,6 +9,9 @@ namespace OOP
 	class CRigidBodyComponent : public CComponent
 	{
 	public:
+		static uint32 GetAtIndex() { return 1; }
+
+	public:
 		NIF_F()
 		CVector3 m_velocity;
 	};

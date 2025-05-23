@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include "OOP/Movement.h"
 #include "Oopecs_private.h"
 
 using namespace Niflect;
@@ -7,34 +8,29 @@ int main(int argc, char** argv)
 {
 	auto reg = GetModuleRegistry();
 	reg->InitRegisteredModules();
-	using namespace OOP;
 	{
-		auto type = StaticGetType<CTransformComponent>();
-		CTransformComponent src;
-		src.m_position.m_x = 1;
-		src.m_position.m_y = 2;
-		src.m_position.m_z = 3;
-		CRwNode rw;
-		type->SaveInstanceToRwNode(&src, &rw);
-		CTransformComponent dst;
-		type->LoadInstanceFromRwNode(&dst, &rw);
-		ASSERT(src.m_position.m_x == dst.m_position.m_x);
-		ASSERT(src.m_position.m_y == dst.m_position.m_y);
-		ASSERT(src.m_position.m_z == dst.m_position.m_z);
-	}
-	{
-		auto type = StaticGetType<CRigidBodyComponent>();
-		CRigidBodyComponent src;
-		src.m_velocity.m_x = 1;
-		src.m_velocity.m_y = 2;
-		src.m_velocity.m_z = 3;
-		CRwNode rw;
-		type->SaveInstanceToRwNode(&src, &rw);
-		CRigidBodyComponent dst;
-		type->LoadInstanceFromRwNode(&dst, &rw);
-		ASSERT(src.m_velocity.m_x == dst.m_velocity.m_x);
-		ASSERT(src.m_velocity.m_y == dst.m_velocity.m_y);
-		ASSERT(src.m_velocity.m_z == dst.m_velocity.m_z);
+		using namespace OOP;
+		Niflect::TArray<CSharedNode> vecNode;
+		for (uint32 idx = 0; idx < 1; ++idx)
+		{
+			auto node = Niflect::MakeShared<CNode>();
+			node->InitComponent<CTransformComponent>();
+			node->InitComponent<CRigidBodyComponent>();
+			vecNode.push_back(node);
+		}
+		const uint32 simTimes = 1000;
+		const float deltaTime = 1 / 60.0f;
+		for (auto& it : vecNode)
+		{
+			auto rigidBody = it->GetComponent<CRigidBodyComponent>();
+			rigidBody->m_velocity = 1.0f;
+		}
+		for (uint32 idx = 0; idx < simTimes; ++idx)
+			SimulateMovement(vecNode, deltaTime);
+		auto& result = vecNode[0]->GetComponent<CTransformComponent>()->m_position.m_x;
+		auto expected = simTimes * deltaTime;
+		ASSERT(std::abs(result - expected) < 1e-4f);
+		printf("");
 	}
 	return 0;
 }

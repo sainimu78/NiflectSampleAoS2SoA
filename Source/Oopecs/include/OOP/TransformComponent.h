@@ -9,6 +9,9 @@ namespace OOP
 	class CTransformComponent : public CComponent
 	{
 	public:
+		static uint32 GetAtIndex() { return 0; }
+
+	public:
 		NIF_F()
 		CVector3 m_position;
 	};
