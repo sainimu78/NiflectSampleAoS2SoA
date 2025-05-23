@@ -7,11 +7,15 @@ namespace OOP
 {
 	static void SimulateMovement(const Niflect::TArray<CSharedNode>& vecNode, float deltaTime)
 	{
-		for (auto& it : vecNode)
+		for (auto& it0 : vecNode)
 		{
-			auto transform = it->GetComponent<CTransformComponent>();
-			auto rigidBody = it->GetComponent<CRigidBodyComponent>();
-			transform->m_position += rigidBody->m_velocity * deltaTime;
+			for (auto& it1 : it0->m_vecComponent)
+				it1->StartFrame(deltaTime);
+		}
+		for (auto& it0 : vecNode)
+		{
+			for (auto& it1 : it0->m_vecComponent)
+				it1->Tick(deltaTime);
 		}
 	}
 }

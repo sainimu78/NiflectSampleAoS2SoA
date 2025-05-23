@@ -10,18 +10,21 @@ namespace OOP
 		template <typename T>
 		T* InitComponent()
 		{
-			auto idx = T::GetAtIndex();
-			if (m_vecComponent.size() <= idx)
-				m_vecComponent.resize(idx + 1);
 			auto component = Niflect::MakeShared<T>();
-			m_vecComponent[idx] = component;
+			component->Init(this, Niflect::StaticGetType<T>());
+			m_vecComponent.push_back(component);
 			return component.Get();
 		}
 		template <typename T>
-		T* GetComponent() const
+		T* FindComponentOfType() const
 		{
-			ASSERT(dynamic_cast<T*>(m_vecComponent[T::GetAtIndex()].Get()) != NULL);
-			return static_cast<T*>(m_vecComponent[T::GetAtIndex()].Get());
+			for (auto& it : m_vecComponent)
+			{
+				if (it->GetType() == Niflect::StaticGetType<T>())
+					return static_cast<T*>(it.Get());
+			}
+			ASSERT(false);
+			return NULL;
 		}
 		Niflect::TArray<CSharedComponent> m_vecComponent;
 	};

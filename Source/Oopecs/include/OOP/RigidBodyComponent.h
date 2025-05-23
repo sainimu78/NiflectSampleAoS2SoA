@@ -9,7 +9,9 @@ namespace OOP
 	class CRigidBodyComponent : public CComponent
 	{
 	public:
-		static uint32 GetAtIndex() { return 1; }
+		virtual void Tick(float deltaTime) override
+		{
+		}
 
 	public:
 		NIF_F()

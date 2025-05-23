@@ -2,6 +2,7 @@
 #include "Niflect/Default/DefaultMacroTag.h"
 #include "OOP/Component.h"
 #include "Math/Vector3.h"
+#include "OOP/RigidBodyComponent.h"
 
 namespace OOP
 {
@@ -9,10 +10,26 @@ namespace OOP
 	class CTransformComponent : public CComponent
 	{
 	public:
-		static uint32 GetAtIndex() { return 0; }
+		CTransformComponent()
+			: m_rigidBody(NULL)
+		{
+		}
+
+	public:
+		virtual void StartFrame(float deltaTime) override
+		{
+			m_rigidBody = m_owner->FindComponentOfType<CRigidBodyComponent>();
+		}
+		virtual void Tick(float deltaTime) override
+		{
+			m_position += m_rigidBody->m_velocity * deltaTime;
+		}
 
 	public:
 		NIF_F()
 		CVector3 m_position;
+
+	private:
+		CRigidBodyComponent* m_rigidBody;
 	};
 }
