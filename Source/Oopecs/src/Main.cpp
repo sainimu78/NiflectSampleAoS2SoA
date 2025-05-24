@@ -36,6 +36,38 @@ int main(int argc, char** argv)
 	if (true)//if (false)//
 	{
 		using namespace ECS;
+		if (false)
+		{
+			CSystem sys;
+			Niflect::TArray<CSharedNode> vecNode;
+			for (uint32 idx = 0; idx < 2; ++idx)
+			{
+				auto node = Niflect::MakeShared<CNode>();
+				node->InitComponent<CTransformComponent>();
+				node->InitComponent<CRigidBodyComponent>();
+				vecNode.push_back(node);
+			}
+			{
+				CSoaLayoutEntitiesFieldInstance binder;
+				binder.Convert(vecNode, CArchetypeFieldRefArray().Add(&CTransformComponent::m_position));
+				sys.InitArchetypeBuffer(binder);
+			}
+			auto srcNode = vecNode[0].Get();
+			auto dstNode = vecNode[1].Get();
+			auto type = StaticGetType<CVector3>();
+			auto& src = srcNode->FindComponentOfType<CTransformComponent>()->m_position;
+			src.Init(OOP::CVector3(1, 2, 3));
+			CRwNode rw;
+			type->SaveInstanceToRwNode(&src, &rw);
+			auto& dst = dstNode->FindComponentOfType<CTransformComponent>()->m_position;
+			type->LoadInstanceFromRwNode(&dst, &rw);
+			auto& srcRef = src.Get();
+			auto& dstRef = dst.Get();
+			ASSERT(srcRef.m_x == dstRef.m_x);
+			ASSERT(srcRef.m_y == dstRef.m_y);
+			ASSERT(srcRef.m_z == dstRef.m_z);
+		}
+
 		Niflect::TArray<CSharedNode> vecNode;
 		for (uint32 idx = 0; idx < nodesCount; ++idx)
 		{
@@ -44,20 +76,20 @@ int main(int argc, char** argv)
 			node->InitComponent<CRigidBodyComponent>();
 			vecNode.push_back(node);
 		}
-		CAosSoaBinder binder;
-		for (auto& it : vecNode)
-		{
-			FindAndBindFieldInComponent(it.Get(), &CTransformComponent::m_position, binder);
-			FindAndBindFieldInComponent(it.Get(), &CRigidBodyComponent::m_velocity, binder);
-		}
 		CSystem sys;
-		sys.InitEntityComponent(vecNode, 0, binder);
-		auto velocities = sys.m_componentBuffer.GetMutableComponentBase<ECS::CVector3::RefType>(ToIndex(EMovementComponentIndex::Velocity));
+		{
+			CSoaLayoutEntitiesFieldInstance binder;
+			binder.Convert(vecNode, CArchetypeFieldRefArray()
+				.Add(&CTransformComponent::m_position)
+				.Add(&CRigidBodyComponent::m_velocity));
+			sys.InitArchetypeBuffer(binder);
+		}
+		auto velocities = sys.m_archetypeBuffer.GetMutableComponentBase<ECS::CVector3::RefType>(ToIndex(EMovementComponentIndex::Velocity));
 		for (uint32 idx = 0; idx < sys.m_entitiesCount; ++idx)
 			velocities[idx] = 1;
 		for (uint32 idx = 0; idx < simTimes; ++idx)
 			SimulateMovement(sys, deltaTime);
-		auto positions = sys.m_componentBuffer.GetComponentBase<ECS::CVector3::RefType>(ToIndex(EMovementComponentIndex::Position));
+		auto positions = sys.m_archetypeBuffer.GetComponentBase<ECS::CVector3::RefType>(ToIndex(EMovementComponentIndex::Position));
 		for (uint32 idx = 0; idx < sys.m_entitiesCount; ++idx)
 			vecResultPosition.push_back(positions[idx]);
 	}

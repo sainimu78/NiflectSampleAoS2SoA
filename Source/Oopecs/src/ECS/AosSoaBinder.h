@@ -4,54 +4,35 @@
 
 namespace ECS
 {
-	class CAosSoaBinder
+	struct CFieldRefTypeAndIndex
 	{
+		Niflect::CNiflectType* m_fieldRef;
+		Niflect::CNiflectType* m_ownerType;
+		Niflect::OffsetType m_fieldOffset;
+	};
+
+	class CArchetypeFieldRefArray
+	{
+		typedef CArchetypeFieldRefArray CThis;
 	public:
-		//CAosToSoaConverter()
-		//{
-		//}
-		void Convert(Niflect::InstanceType* base, Niflect::TArray<Niflect::CField*> vecFieldInvolved)
-		{
-			for (auto& it : vecFieldInvolved)
-			{
-				auto fieldBase =  Niflect::GetOffsetAddr(base, it->GetOffset());
-				auto instance = static_cast<CComponentBufferElementRef*>(fieldBase);
-				ASSERT(instance->m_type == it->GetType());
-				m_vecBufElemRef.push_back(instance);
-			}
-		}
 		template <typename TField, typename TType>
-		void Add(Niflect::InstanceType* base, TField TType::* fieldAddr)
+		CThis& Add(TField TType::* fieldAddr)
 		{
 			auto type = Niflect::StaticGetType<TType>();
+			auto fieldRef = Niflect::StaticGetType<TField::RefType>();
 			auto offsetSpecified = Niflect::GetFieldOffset<TField, TType>(fieldAddr);
+			Niflect::OffsetType fieldOffset = Niflect::OFFSET_NONE;
 			for (auto& it : type->GetFields())
 			{
 				if (it.GetOffset() == offsetSpecified)
 				{
-					auto fieldBase = Niflect::GetOffsetAddr(base, it.GetOffset());
-					auto instance = static_cast<CComponentBufferElementRef*>(fieldBase);
-					ASSERT(instance->m_type == Niflect::StaticGetType<TField::RefType>());
-					m_vecBufElemRef.push_back(instance);
+					fieldOffset = it.GetOffset();
 					break;
 				}
 			}
+			m_vec.push_back({ fieldRef, type, fieldOffset });
+			return *this;
 		}
-		Niflect::TArray<CComponentBufferElementRef*> m_vecBufElemRef;
-		//Niflect::CNiflectType* m_type;
-		//Niflect::TArray<Niflect::CField*> m_vecFieldInvolved;
-		//Niflect::InstanceType* m_base;
+		Niflect::TArray<CFieldRefTypeAndIndex> m_vec;
 	};
-	//class CAosToSoaDesc
-	//{
-	//public:
-	//	CAosToSoaDesc()
-	//		: m_type(NULL)
-	//		, m_base(NULL)
-	//	{
-	//	}
-	//	Niflect::CNiflectType* m_type;
-	//	Niflect::TArray<Niflect::CField*> m_vecFieldInvolved;
-	//	Niflect::InstanceType* m_base;
-	//};
 }

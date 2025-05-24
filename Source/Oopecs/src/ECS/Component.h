@@ -38,69 +38,63 @@ namespace ECS
 	class CComponentBuffer
 	{
 	public:
-		void Alloc(uint32 entityStartIdx, uint32 entitiesCount, const CAosSoaBinder& binder)
+		CComponentBuffer()
+			: m_type(NULL)
+			, m_entitiesCount(0)
 		{
-			m_vecArchetypeIdxToComponentBuffer.resize(binder.m_vecBufElemRef.size());
-			for (uint32 idx0 = 0; idx0 < m_vecArchetypeIdxToComponentBuffer.size(); ++idx0)
-			{
-				auto& ref = binder.m_vecBufElemRef[idx0];
-				auto& it0 = ref->m_type;
-				auto& size = it0->GetTypeSize();
-				//auto& alignment = it0->GetTypeAlignment();
-				//auto bytesCount = size + (alignment - (size % alignment));
-				auto& buffer = m_vecArchetypeIdxToComponentBuffer[idx0];
-				auto oldSize = buffer.m_data.size();
-				ref->InitOffset(oldSize);
-				buffer.m_type = it0;
-				buffer.m_size = size;
-				auto newSize = size * (entityStartIdx + entitiesCount);
-				buffer.m_data.resize(newSize);
-				auto& ctorInfo = it0->m_vecConstructorInfo[0];
-				ASSERT(ctorInfo.m_vecInput.size() == 0);
-				ctorInfo.m_Func(&buffer.m_data[oldSize], NULL);
-			}
 		}
-		void Free(uint32 entityStartIdx, uint32 entitiesCount)
+		void Init(Niflect::CNiflectType* type)
 		{
-			for (uint32 idx0 = 0; idx0 < m_vecArchetypeIdxToComponentBuffer.size(); ++idx0)
-			{
-				auto& buffer = m_vecArchetypeIdxToComponentBuffer[idx0];
-				auto remainingSize = buffer.m_data.size() - buffer.m_size * (entityStartIdx + entitiesCount);
-				buffer.m_data.resize(remainingSize);
-			}
+			m_type = type;
 		}
-		template <typename T>
-		T* GetMutableComponentBase(uint32 archetypeIdx)
+		void Alloc(uint32 countToAdd)
 		{
-			auto& buffer = m_vecArchetypeIdxToComponentBuffer[archetypeIdx];
-			auto base = buffer.m_data.data();
-			ASSERT(buffer.m_type == Niflect::StaticGetType<T>());
-			return reinterpret_cast<T*>(base);
+			auto& size = m_type->GetTypeSize();
+			auto newCount = m_entitiesCount + countToAdd;
+			auto newSize = size * newCount;
+			m_bytes.resize(newSize);
+			auto& ctorInfo = m_type->m_vecConstructorInfo[0];
+			ASSERT(ctorInfo.m_vecInput.size() == 0);
+			for (uint32 idx = m_entitiesCount; idx < newCount; ++idx)
+				ctorInfo.m_Func(this->GetData(size * idx), NULL);
+			m_entitiesCount = newCount;
 		}
-		template <typename T>
-		const T* GetComponentBase(uint32 archetypeIdx) const
+		void Free(uint32 countToDelete)
 		{
-			auto& buffer = m_vecArchetypeIdxToComponentBuffer[archetypeIdx];
-			auto base = buffer.m_data.data();
-			ASSERT(buffer.m_type == Niflect::StaticGetType<T>());
-			return reinterpret_cast<const T*>(base);
+			auto& size = m_type->GetTypeSize();
+			auto newCount = m_entitiesCount - countToDelete;
+			auto newSize = size * newCount;
+			auto& DtorFunc = m_type->m_InvokeDestructorFunc;
+			for (uint32 idx = newCount; idx < m_entitiesCount; ++idx)
+				DtorFunc(this->GetData(size * idx));
+			m_bytes.resize(newSize);
+			m_entitiesCount = newCount;
+		}
+		void Destroy(uint32 start, uint32 count)
+		{
+			auto& size = m_type->GetTypeSize();
+			auto& DtorFunc = m_type->m_InvokeDestructorFunc;
+			for (uint32 idx = start; idx < start + count; ++idx)
+				DtorFunc(this->GetData(size * idx));
+		}
+		void DestroyAll()
+		{
+			this->Destroy(0, m_entitiesCount);
+		}
+		uint32 GetEntitiesCount() const
+		{
+			return m_entitiesCount;
 		}
 
 	private:
-		class CBuffer
+		void* GetData(uint32 offset)
 		{
-		public:
-			CBuffer()
-				: m_size(0)
-				, m_type(NULL)
-			{
-			}
-			uint32 m_size;
-			Niflect::CNiflectType* m_type;
-			Niflect::TArray<uint8> m_data;
-		};
+			return static_cast<void*>(&m_bytes[offset]);
+		}
 
 	public:
-		Niflect::TArray<CBuffer> m_vecArchetypeIdxToComponentBuffer;
+		Niflect::CNiflectType* m_type;
+		Niflect::TArray<uint8> m_bytes;
+		uint32 m_entitiesCount;
 	};
 }

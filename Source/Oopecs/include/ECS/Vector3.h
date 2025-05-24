@@ -8,5 +8,11 @@ namespace ECS
 	NIF_T()
 	class CVector3 : public TComponentBufferElementRef<OOP::CVector3>
 	{
+	public:
+		void Init(const OOP::CVector3& vector)
+		{
+			auto& ref = this->GetMutable();
+			ref = vector;
+		}
 	};
 }

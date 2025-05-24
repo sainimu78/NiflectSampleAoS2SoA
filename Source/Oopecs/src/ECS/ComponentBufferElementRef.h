@@ -3,29 +3,44 @@
 
 namespace ECS
 {
+	class CArchetypeBuffer;
+
 	class CComponentBufferElementRef
 	{
-	public:
-		CComponentBufferElementRef()
-			: m_type(NULL)
-			, m_offset(Niflect::OFFSET_NONE)
-		{
-		}
+	//public:
+	//	CComponentBufferElementRef()
+	//		: m_type(NULL)
+	//		, m_offset(Niflect::OFFSET_NONE)
+	//		, m_owner(NULL)
+	//		, m_archetypeIdx(INDEX_NONE)
+	//	{
+	//	}
+
+	protected:
 		CComponentBufferElementRef(Niflect::CNiflectType* type)
 			: m_type(type)
-			, m_offset(Niflect::OFFSET_NONE)
+			, m_bufferOffset(Niflect::OFFSET_NONE)
+			, m_buffer(NULL)
+			, m_archetypeIdx(INDEX_NONE)
 		{
 		}
-		void InitOffset(const Niflect::OffsetType& offset)
+
+	public:
+		void InitRef(CArchetypeBuffer* buffer, uint32 archetypeIdx, const Niflect::OffsetType& bufferOffset)
 		{
-			m_offset = offset;
+			m_buffer = buffer;
+			m_archetypeIdx = archetypeIdx;
+			m_bufferOffset = bufferOffset;
 		}
+		void* GetAddr() const;
 
 	public:
 		Niflect::CNiflectType* m_type;
 
 	private:
-		Niflect::OffsetType m_offset;
+		Niflect::OffsetType m_bufferOffset;
+		CArchetypeBuffer* m_buffer;
+		uint32 m_archetypeIdx;
 	};
 
 	template <typename T>
@@ -38,6 +53,14 @@ namespace ECS
 		TComponentBufferElementRef()
 			: inherited(Niflect::StaticGetType<T>())
 		{
+		}
+		T& GetMutable()
+		{
+			return *static_cast<T*>(this->GetAddr());
+		}
+		const T& Get() const
+		{
+			return *static_cast<const T*>(this->GetAddr());
 		}
 	};
 }
