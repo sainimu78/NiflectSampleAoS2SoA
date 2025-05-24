@@ -1,3 +1,4 @@
+#pragma once
 #include "Niflect/NiflectAccessor.h"
 #include "Math/Vector3.h"
 
