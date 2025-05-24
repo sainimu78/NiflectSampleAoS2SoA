@@ -1,7 +1,7 @@
 #pragma once
 #include "Niflect/Default/DefaultMacroTag.h"
 #include "OOP/Component.h"
-#include "Math/Vector3.h"
+#include "OOP/Vector3.h"
 #include "OOP/RigidBodyComponent.h"
 
 namespace OOP

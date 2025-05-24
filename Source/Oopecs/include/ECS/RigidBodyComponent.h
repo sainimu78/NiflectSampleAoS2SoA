@@ -1,17 +1,17 @@
 #pragma once
 #include "Niflect/Default/DefaultMacroTag.h"
-#include "OOP/Component.h"
-#include "OOP/Vector3.h"
+#include "ECS/Component.h"
+#include "ECS/Vector3.h"
 
-namespace OOP
+namespace ECS
 {
 	NIF_T()
 	class CRigidBodyComponent : public CComponent
 	{
 	public:
-		virtual void Tick(float deltaTime) override
-		{
-		}
+		//virtual void Tick(float deltaTime) override
+		//{
+		//}
 
 	public:
 		NIF_F()
