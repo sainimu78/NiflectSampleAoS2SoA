@@ -1,12 +1,9 @@
 #include <stdio.h>
-#include "ECS/RigidBodyComponent.h"
-#include "ECS/TransformComponent.h"
-#include "ECS/Node.h"
 #include "OOP/Movement.h"
 #include "ECS/Movement.h"
-#include "Oopecs_private.h"
 #include <chrono>
 #include <iostream>
+#include "Oopecs_private.h"
 
 using namespace Niflect;
 
