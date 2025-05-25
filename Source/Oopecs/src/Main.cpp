@@ -5,6 +5,8 @@
 #include "OOP/Movement.h"
 #include "ECS/Movement.h"
 #include "Oopecs_private.h"
+#include <chrono>
+#include <iostream>
 
 using namespace Niflect;
 
@@ -16,7 +18,7 @@ int main(int argc, char** argv)
 	const float deltaTime = 1 / 60.0f;
 	const uint32 nodesCount = 5;
 	Niflect::TArray<OOP::CVector3> vecResultPosition;
-	if (false)//if (true)
+	if (false)//if (true)//
 	{
 		using namespace OOP;
 		Niflect::TArray<CSharedNode> vecNode;
@@ -28,12 +30,15 @@ int main(int argc, char** argv)
 			rigidBody->m_velocity = 1.0f;
 			vecNode.push_back(node);
 		}
+		auto start = std::chrono::high_resolution_clock::now();
 		for (uint32 idx = 0; idx < simTimes; ++idx)
 			SimulateMovement(vecNode, deltaTime);
+		auto end = std::chrono::high_resolution_clock::now();
+		std::cout << "OOP Time: " << (end - start).count() << " ns" << std::endl;
 		for (uint32 idx = 0; idx < vecNode.size(); ++idx)
 			vecResultPosition.push_back(vecNode[idx]->m_vecComponent[0].Cast<CTransformComponent>()->m_position);
 	}
-	if (true)//if (false)//
+	else
 	{
 		using namespace ECS;
 		{
@@ -95,8 +100,11 @@ int main(int argc, char** argv)
 		}
 		for (auto& it : vecNode)
 			it->FindComponentOfType<CRigidBodyComponent>()->m_velocity.Init({ 1 });
+		auto start = std::chrono::high_resolution_clock::now();
 		for (uint32 idx = 0; idx < simTimes; ++idx)
 			CMovementSystem::Simulate(entitiesBuffer, deltaTime);
+		auto end = std::chrono::high_resolution_clock::now();
+		std::cout << "ECS Time: " << (end - start).count() << " ns" << std::endl;
 		for (auto& it : vecNode)
 			vecResultPosition.push_back(it->FindComponentOfType<CTransformComponent>()->m_position.Get());
 	}
