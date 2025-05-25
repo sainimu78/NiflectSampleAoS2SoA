@@ -47,17 +47,18 @@ int main(int argc, char** argv)
 				vecNode.push_back(node);
 			}
 			{
-				CAosSoaBinder binder;
-				binder.Bind(vecNode, CArchetypeAndFieldBindings().Add(&CTransformComponent::m_position));
-				sys.InitEntitiyBuffer(binder);
+				CAosEntitiesSoaArchecomponentsBinder binder;
+				binder.Bind(vecNode, CArchecomponentAndFieldBindings().Add(&CTransformComponent::m_position));
+				sys.InitEntitiesBuffer(binder);
 			}
 			auto srcNode = vecNode[0].Get();
 			auto dstNode = vecNode[1].Get();
 			auto type = StaticGetType<CVector3>();
 			auto& src = srcNode->FindComponentOfType<CTransformComponent>()->m_position;
-			src.Init(OOP::CVector3(1, 2, 3));
+			src.Init({ 1, 2, 3 });
 			CRwNode rw;
 			type->SaveInstanceToRwNode(&src, &rw);
+			ASSERT(rw.IsValue());
 			auto& dst = dstNode->FindComponentOfType<CTransformComponent>()->m_position;
 			type->LoadInstanceFromRwNode(&dst, &rw);
 			auto& srcRef = src.Get();
@@ -77,11 +78,11 @@ int main(int argc, char** argv)
 		}
 		CSystem sys;
 		{
-			CAosSoaBinder binder;
-			binder.Bind(vecNode, CArchetypeAndFieldBindings()
+			CAosEntitiesSoaArchecomponentsBinder binder;
+			binder.Bind(vecNode, CArchecomponentAndFieldBindings()
 				.Add(&CTransformComponent::m_position)
 				.Add(&CRigidBodyComponent::m_velocity));
-			sys.InitEntitiyBuffer(binder);
+			sys.InitEntitiesBuffer(binder);
 		}
 		for (auto& it : vecNode)
 			it->FindComponentOfType<CRigidBodyComponent>()->m_velocity.Init({ 1 });

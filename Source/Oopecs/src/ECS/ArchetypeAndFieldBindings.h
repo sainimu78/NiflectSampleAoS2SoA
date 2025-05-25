@@ -1,19 +1,19 @@
 #pragma once
 #include "Niflect/NiflectType.h"
-#include "ECS/ComponentHandle.h"
+#include "ECS/ArchecomponentHandle.h"
 
 namespace ECS
 {
-	struct CArchetypeAndField
+	struct CArchecomponentAndField
 	{
-		Niflect::CNiflectType* m_soaComponentArchetype;
+		Niflect::CNiflectType* m_soaArchecomponentType;
 		Niflect::CNiflectType* m_aosFieldOwnerType;
 		Niflect::OffsetType m_aosFieldOffset;
 	};
 
-	class CArchetypeAndFieldBindings
+	class CArchecomponentAndFieldBindings
 	{
-		typedef CArchetypeAndFieldBindings CThis;
+		typedef CArchecomponentAndFieldBindings CThis;
 	public:
 		template <typename TField, typename TType>
 		CThis& Add(TField TType::* fieldAddr)
@@ -33,6 +33,6 @@ namespace ECS
 			m_vec.push_back({ soaArchetypeSpecified, aosFieldOwnerType, aosFieldOffset });
 			return *this;
 		}
-		Niflect::TArray<CArchetypeAndField> m_vec;
+		Niflect::TArray<CArchecomponentAndField> m_vec;
 	};
 }

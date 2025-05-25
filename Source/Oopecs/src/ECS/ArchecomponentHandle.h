@@ -3,16 +3,16 @@
 
 namespace ECS
 {
-	class CSoaEntityBuffer;
+	class CSoaEntitiesBuffer;
 
-	class CComponentHandle
+	class CArchecomponentHandle
 	{
-		friend class CSoaEntityBuffer;
+		friend class CSoaEntitiesBuffer;
 	protected:
-		CComponentHandle(Niflect::CNiflectType* debugArchetype)
+		CArchecomponentHandle(Niflect::CNiflectType* debugArchetype)
 			: m_entityOffset(Niflect::OFFSET_NONE)
 			, m_buffer(NULL)
-			, m_componentIdx(INDEX_NONE)
+			, m_archecompIdx(INDEX_NONE)
 #ifdef NODEBUG
 #else
 			, m_debugArchetype(debugArchetype)
@@ -22,10 +22,10 @@ namespace ECS
 		void* GetAddr() const;
 
 	private:
-		void InitHandle(CSoaEntityBuffer* buffer, uint32 componentIdx, const Niflect::OffsetType& entityOffset)
+		void InitHandle(CSoaEntitiesBuffer* buffer, uint32 archecompIdx, const Niflect::OffsetType& entityOffset)
 		{
 			m_buffer = buffer;
-			m_componentIdx = componentIdx;
+			m_archecompIdx = archecompIdx;
 			m_entityOffset = entityOffset;
 		}
 
@@ -37,18 +37,18 @@ namespace ECS
 
 	private:
 		Niflect::OffsetType m_entityOffset;
-		CSoaEntityBuffer* m_buffer;
-		uint32 m_componentIdx;
+		CSoaEntitiesBuffer* m_buffer;
+		uint32 m_archecompIdx;
 	};
 
 	template <typename T>
-	class TComponentHandle : public CComponentHandle
+	class TArchecomponentHandle : public CArchecomponentHandle
 	{
-		typedef CComponentHandle inherited;
+		typedef CArchecomponentHandle inherited;
 	public:
 		using TArchetype = T;
 	public:
-		TComponentHandle()
+		TArchecomponentHandle()
 			: inherited(Niflect::StaticGetType<TArchetype>())
 		{
 		}

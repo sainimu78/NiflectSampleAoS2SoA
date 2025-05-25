@@ -1,12 +1,12 @@
 #pragma once
-#include "ECS/ComponentHandle.h"
+#include "ECS/ArchecomponentHandle.h"
 
 namespace ECS
 {
 	using namespace RwTree;
 
 	template <typename THandle>
-	class TComponentHandleAccessor : public Niflect::CNiflectAccessor
+	class TArchecomponentHandleAccessor : public Niflect::CNiflectAccessor
 	{
 	protected:
 		virtual bool SaveInstanceImpl(const InstanceType* base, CRwNode* rw) const override
