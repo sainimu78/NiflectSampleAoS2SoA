@@ -38,7 +38,6 @@ int main(int argc, char** argv)
 		using namespace ECS;
 		{
 			CSoaEntitiesBuffer entitiesBuffer;
-			CSystem sys(entitiesBuffer);
 			Niflect::TArray<CSharedNode> vecNode;
 			for (uint32 idx = 0; idx < 2; ++idx)
 			{
@@ -85,11 +84,10 @@ int main(int argc, char** argv)
 				.Add(&CRigidBodyComponent::m_velocity));
 			entitiesBuffer.InitAllocBind(binder);
 		}
-		CSystem sys(entitiesBuffer);
 		for (auto& it : vecNode)
 			it->FindComponentOfType<CRigidBodyComponent>()->m_velocity.Init({ 1 });
 		for (uint32 idx = 0; idx < simTimes; ++idx)
-			SimulateMovement(sys, deltaTime);
+			SimulateMovement(entitiesBuffer, deltaTime);
 		for (auto& it : vecNode)
 			vecResultPosition.push_back(it->FindComponentOfType<CTransformComponent>()->m_position.Get());
 	}

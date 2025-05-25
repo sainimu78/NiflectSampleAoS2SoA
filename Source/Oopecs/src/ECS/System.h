@@ -58,7 +58,7 @@ namespace ECS
 			this->AllocAndBind(binder.m_vecAosEntityArchecomponentHandles);
 		}
 		template <typename T>
-		T* GetMutableArchecomponents(uint32 archecompIdx)
+		T* GetMutableBase(uint32 archecompIdx)
 		{
 			auto& buffer = m_vecArchecomponentBuffer[archecompIdx];
 			auto base = buffer.m_bytes.data();
@@ -66,7 +66,7 @@ namespace ECS
 			return reinterpret_cast<T*>(base);
 		}
 		template <typename T>
-		const T* GetArchecomponents(uint32 archecompIdx) const
+		const T* GetBase(uint32 archecompIdx) const
 		{
 			auto& buffer = m_vecArchecomponentBuffer[archecompIdx];
 			auto base = buffer.m_bytes.data();
@@ -119,16 +119,5 @@ namespace ECS
 	public:
 		uint32 m_entitiesCount;
 		Niflect::TArray<CArchecomponentBuffer> m_vecArchecomponentBuffer;
-	};
-
-	class CSystem
-	{
-	public:
-		CSystem(CSoaEntitiesBuffer& entitiesBuffer)
-			: m_entitiesBuffer(entitiesBuffer)
-		{
-		}
-
-		CSoaEntitiesBuffer& m_entitiesBuffer;
 	};
 }
