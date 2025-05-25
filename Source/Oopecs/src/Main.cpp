@@ -36,7 +36,6 @@ int main(int argc, char** argv)
 	if (true)//if (false)//
 	{
 		using namespace ECS;
-		if (false)
 		{
 			CSystem sys;
 			Niflect::TArray<CSharedNode> vecNode;
