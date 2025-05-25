@@ -9,7 +9,7 @@ namespace ECS
 	class CRigidBodyComponent : public CComponent
 	{
 	public:
-		NIF_F()
+		NIF_F(CComponentNata().ConfirmCompatible<CMovementSystem>())
 		CVector3 m_velocity;
 	};
 }

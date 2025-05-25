@@ -4,6 +4,8 @@
 #include "ECS/Archecomponent.h"
 #include "ECS/ArchetypeAndFieldBindings.h"
 
+#include "ECS/Vector3.h"//未建立 ArchecomponentHandleType 与 Archetype 的绑定, 临时 include
+
 namespace ECS
 {
 	using CEntitiesArchecomponentHandles = Niflect::TArray<Niflect::TArray<CArchecomponentHandle*> >;
@@ -11,6 +13,58 @@ namespace ECS
 	class CAosEntitiesSoaArchecomponentsBinder
 	{
 	public:
+		void BindDefault(const Niflect::TArray<CSharedNode>& vecNode, const Niflect::TArray<Niflect::CNiflectType*>& vecSystemTypeBindFor)
+		{
+			auto firstNodeAsBindingTemplate = vecNode[0].Get();
+			Niflect::TArray<Niflect::CNiflectType*> vecAosComponentType;
+			for (auto& it : firstNodeAsBindingTemplate->m_vecComponent)
+				vecAosComponentType.push_back(it->GetType());
+			
+			auto CheckAllNodesMeetRequirementFunc = [&]()
+				{
+					for (uint32 idx0 = 1; idx0 < vecNode.size(); ++idx0)
+					{
+						auto it0 = vecNode[idx0].Get();
+						for (auto& it1 : it0->m_vecComponent)
+							ASSERT(std::find(vecAosComponentType.begin(), vecAosComponentType.end(), it1->GetType()) != vecAosComponentType.end());
+					}
+					return true;
+				};
+			ASSERT(CheckAllNodesMeetRequirementFunc());
+			
+			CArchecomponentAndFieldBindings bindings;
+			for (auto& it0 : vecAosComponentType)
+			{
+				for (auto& it1 : it0->GetFields())
+				{
+					if (auto nata = it1.GetNata())
+					{
+						auto compNata = Niflect::CastDerivedNata<CComponentNata>(it1.GetNata());
+						for (auto& it2 : vecSystemTypeBindFor)
+						{
+							if (compNata->m_setCompatibleSysType.find(it2) != compNata->m_setCompatibleSysType.end())
+							{
+								Niflect::CNiflectType* soaArchetypeSpecified = NULL;
+								//begin, 
+								//1. 须实现自动注册, 建议通过 NIFRIEND 的 CThis 封装
+								//2. 以首个 node 为绑定模板不合适, 应考虑通过独立的 Archecomponent 排列定义作为依据
+								//3. System 在使用时应能通过标识获取 ArchecomponentBuffer, 以实现可复用的 entitiesBUffer
+								if (it1.GetType() == Niflect::StaticGetType<CVector3>())
+									soaArchetypeSpecified = Niflect::StaticGetType<CVector3::TArchetype>();
+								//end
+								ASSERT(soaArchetypeSpecified != NULL);
+								auto aosFieldOwnerType = it0;
+								auto aosOffsetSpecified = it1.GetOffset();
+								bindings.Add2({ soaArchetypeSpecified, aosFieldOwnerType, aosOffsetSpecified });
+								break;
+							}
+						}
+					}
+				}
+			}
+
+			this->Bind(vecNode, bindings);
+		}
 		void Bind(const Niflect::TArray<CSharedNode>& vecNode, const CArchecomponentAndFieldBindings& archecompFieldBindings)
 		{
 			auto soaArchecompsCount = archecompFieldBindings.m_vec.size();

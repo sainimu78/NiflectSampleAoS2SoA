@@ -5,17 +5,20 @@ namespace ECS
 {
 	class CSoaEntitiesBuffer;
 
+	//Niflect::TMap<Niflect::CNiflectType*, Niflect::CNiflectType*>& GetMutableArchecomponentHandleTypeToArchetypeMapping();
+	//const Niflect::TMap<Niflect::CNiflectType*, Niflect::CNiflectType*>& GetArchecomponentHandleTypeToArchetypeMapping();
+
 	class CArchecomponentHandle
 	{
 		friend class CSoaEntitiesBuffer;
 	protected:
-		CArchecomponentHandle(Niflect::CNiflectType* debugArchetype)
+		CArchecomponentHandle(Niflect::CNiflectType* archetype)
 			: m_entityOffset(Niflect::OFFSET_NONE)
 			, m_buffer(NULL)
 			, m_archecompIdx(INDEX_NONE)
 #ifdef NODEBUG
 #else
-			, m_debugArchetype(debugArchetype)
+			, m_debugArchetype(archetype)
 #endif
 		{
 		}

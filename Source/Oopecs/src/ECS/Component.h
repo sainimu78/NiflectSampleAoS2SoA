@@ -28,4 +28,21 @@ namespace ECS
 		Niflect::CNiflectType* m_type;
 	};
 	using CSharedComponent = Niflect::TSharedPtr<CComponent>;
+
+	class CComponentNata : public Niflect::CNata
+	{
+		typedef CComponentNata CThis;
+	public:
+		template <typename TSystemType>
+		CThis& ConfirmCompatible()
+		{
+			auto type = Niflect::StaticGetType<TSystemType>();
+			auto ret = m_setCompatibleSysType.insert(type);
+			ASSERT(ret.second);
+			return *this;
+		}
+
+	public:
+		Niflect::TSet<Niflect::CNiflectType*> m_setCompatibleSysType;
+	};
 }

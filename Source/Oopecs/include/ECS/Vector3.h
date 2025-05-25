@@ -9,7 +9,7 @@ namespace ECS
 	class CVector3 : public TArchecomponentHandle<OOP::CVector3>
 	{
 	public:
-		void Init(const OOP::CVector3& vector)
+		void Init(const TArchetype& vector)
 		{
 			this->GetMutable() = vector;
 		}

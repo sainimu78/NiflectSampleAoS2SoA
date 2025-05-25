@@ -1,8 +1,8 @@
 #include <stdio.h>
-#include "OOP/Movement.h"
 #include "ECS/RigidBodyComponent.h"
 #include "ECS/TransformComponent.h"
 #include "ECS/Node.h"
+#include "OOP/Movement.h"
 #include "ECS/Movement.h"
 #include "Oopecs_private.h"
 
@@ -48,7 +48,7 @@ int main(int argc, char** argv)
 			}
 			{
 				CAosEntitiesSoaArchecomponentsBinder binder;
-				binder.Bind(vecNode, CArchecomponentAndFieldBindings().Add(&CTransformComponent::m_position));
+				binder.Bind(vecNode, CArchecomponentAndFieldBindings().AddByFieldAddr(&CTransformComponent::m_position));
 				entitiesBuffer.InitAllocBind(binder);
 			}
 			auto srcNode = vecNode[0].Get();
@@ -77,17 +77,26 @@ int main(int argc, char** argv)
 			vecNode.push_back(node);
 		}
 		CSoaEntitiesBuffer entitiesBuffer;
+		if (true)//if (false)
 		{
 			CAosEntitiesSoaArchecomponentsBinder binder;
 			binder.Bind(vecNode, CArchecomponentAndFieldBindings()
-				.Add(&CTransformComponent::m_position)
-				.Add(&CRigidBodyComponent::m_velocity));
+				.AddByFieldAddr(&CTransformComponent::m_position)
+				.AddByFieldAddr(&CRigidBodyComponent::m_velocity));
+			entitiesBuffer.InitAllocBind(binder);
+		}
+		if (false)//if (true)//
+		{
+			CAosEntitiesSoaArchecomponentsBinder binder;
+			Niflect::TArray<Niflect::CNiflectType*> vecSystemTypeBindFor;
+			vecSystemTypeBindFor.push_back(Niflect::StaticGetType<CMovementSystem>());
+			binder.BindDefault(vecNode, vecSystemTypeBindFor);
 			entitiesBuffer.InitAllocBind(binder);
 		}
 		for (auto& it : vecNode)
 			it->FindComponentOfType<CRigidBodyComponent>()->m_velocity.Init({ 1 });
 		for (uint32 idx = 0; idx < simTimes; ++idx)
-			SimulateMovement(entitiesBuffer, deltaTime);
+			CMovementSystem::Simulate(entitiesBuffer, deltaTime);
 		for (auto& it : vecNode)
 			vecResultPosition.push_back(it->FindComponentOfType<CTransformComponent>()->m_position.Get());
 	}

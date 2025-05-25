@@ -10,7 +10,7 @@ namespace ECS
 	class CTransformComponent : public CComponent
 	{
 	public:
-		NIF_F()
+		NIF_F(CComponentNata().ConfirmCompatible<CMovementSystem>())
 		CVector3 m_position;
 	};
 }
