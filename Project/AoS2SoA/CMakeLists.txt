@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.10.0)
 
 include(../InitRootPath.cmake)
 
-set(c_ProjectName Oopecs)
+set(c_ProjectName AoS2SoA)
 
 include(${c_RootCMakeProjectFrameworkDirPath}/ProjectBegin.cmake)
 project(${c_ProjectName})
@@ -30,7 +30,7 @@ list(APPEND SrcAll ${ModuleHeaders})
 
 add_executable(${ModuleName} ${SrcAll})
 
-target_precompile_headers(${ModuleName} PUBLIC ${ModuleSourcePath}/OopecsCommon.h)
+target_precompile_headers(${ModuleName} PUBLIC ${ModuleSourcePath}/AoS2SoACommon.h)
 
 target_include_directories(${ModuleName}
 	PRIVATE ${IncludePathsPrivate}

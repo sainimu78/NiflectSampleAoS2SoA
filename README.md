@@ -1,1 +1,1 @@
-# NiflectSampleOopecs
+# NiflectSampleAoS2SoA

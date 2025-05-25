@@ -3,7 +3,7 @@
 #include "ECS/Movement.h"
 #include <chrono>
 #include <iostream>
-#include "Oopecs_private.h"
+#include "AoS2SoA_private.h"
 
 using namespace Niflect;
 

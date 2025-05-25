@@ -1,3 +1,3 @@
 @echo off
-@set ProjectDirPath=..\..\..\..\Project\Oopecs
+@set ProjectDirPath=..\..\..\..\Project\AoS2SoA
 @..\..\..\ThirdParty\CMakeProjectFramework\PlatformSpecificScript\Windows\Setup.bat

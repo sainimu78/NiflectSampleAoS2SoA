@@ -1,3 +1,3 @@
 #!/bin/bash
-export ProjectDirPath=../../../../../Project/Oopecs
+export ProjectDirPath=../../../../../Project/AoS2SoA
 ../../../ThirdParty/CMakeProjectFramework/PlatformSpecificScript/Linux/Update.sh
