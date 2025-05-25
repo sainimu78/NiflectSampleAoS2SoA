@@ -13,9 +13,10 @@ namespace ECS
 
 	static void SimulateMovement(CSystem& sys, float deltaTime)
 	{
-		auto positions = sys.m_entitiesBuffer.GetMutableArchecomponents<ECS::CVector3::TArchetype>(ToIndex(EMovementComponentIndex::Position));
-		auto velocities = sys.m_entitiesBuffer.GetArchecomponents<ECS::CVector3::TArchetype>(ToIndex(EMovementComponentIndex::Velocity));
-		for (uint32 idx = 0; idx < sys.m_entitiesCount; ++idx)
+		auto& entitiesBuffer = sys.m_entitiesBuffer;
+		auto positions = entitiesBuffer.GetMutableArchecomponents<ECS::CVector3::TArchetype>(ToIndex(EMovementComponentIndex::Position));
+		auto velocities = entitiesBuffer.GetArchecomponents<ECS::CVector3::TArchetype>(ToIndex(EMovementComponentIndex::Velocity));
+		for (uint32 idx = 0; idx < entitiesBuffer.m_entitiesCount; ++idx)
 			positions[idx] += velocities[idx] * deltaTime;
 	}
 }

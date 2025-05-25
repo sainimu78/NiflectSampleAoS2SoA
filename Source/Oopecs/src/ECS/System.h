@@ -47,8 +47,37 @@ namespace ECS
 	class CSoaEntitiesBuffer
 	{
 	public:
+		CSoaEntitiesBuffer()
+			: m_entitiesCount(0)
+		{
+		}
+		void InitAllocBind(const CAosEntitiesSoaArchecomponentsBinder& binder)
+		{
+			this->Init(binder.m_vecArchecomponentType);
+			auto countToAdd = static_cast<uint32>(binder.m_vecAosEntityArchecomponentHandles.size());
+			this->AllocAndBind(binder.m_vecAosEntityArchecomponentHandles);
+		}
+		template <typename T>
+		T* GetMutableArchecomponents(uint32 archecompIdx)
+		{
+			auto& buffer = m_vecArchecomponentBuffer[archecompIdx];
+			auto base = buffer.m_bytes.data();
+			ASSERT(buffer.m_archetype == Niflect::StaticGetType<T>());
+			return reinterpret_cast<T*>(base);
+		}
+		template <typename T>
+		const T* GetArchecomponents(uint32 archecompIdx) const
+		{
+			auto& buffer = m_vecArchecomponentBuffer[archecompIdx];
+			auto base = buffer.m_bytes.data();
+			ASSERT(buffer.m_archetype == Niflect::StaticGetType<T>());
+			return reinterpret_cast<const T*>(base);
+		}
+
+	private:
 		void Init(const Niflect::TArray<Niflect::CNiflectType*>& vecArchecomponentType)
 		{
+			ASSERT(m_entitiesCount == 0);
 			ASSERT(m_vecArchecomponentBuffer.size() == 0);
 			m_vecArchecomponentBuffer.resize(vecArchecomponentType.size());
 			for (uint32 idx0 = 0; idx0 < vecArchecomponentType.size(); ++idx0)
@@ -84,44 +113,22 @@ namespace ECS
 					it1->InitHandle(this, archecompIdx, offset + buffer.m_archetype->GetTypeSize() * idxEntity);
 				}
 			}
-		}
-		template <typename T>
-		T* GetMutableArchecomponents(uint32 archecompIdx)
-		{
-			auto& buffer = m_vecArchecomponentBuffer[archecompIdx];
-			auto base = buffer.m_bytes.data();
-			ASSERT(buffer.m_archetype == Niflect::StaticGetType<T>());
-			return reinterpret_cast<T*>(base);
-		}
-		template <typename T>
-		const T* GetArchecomponents(uint32 archecompIdx) const
-		{
-			auto& buffer = m_vecArchecomponentBuffer[archecompIdx];
-			auto base = buffer.m_bytes.data();
-			ASSERT(buffer.m_archetype == Niflect::StaticGetType<T>());
-			return reinterpret_cast<const T*>(base);
+			m_entitiesCount += countToAdd;
 		}
 
 	public:
+		uint32 m_entitiesCount;
 		Niflect::TArray<CArchecomponentBuffer> m_vecArchecomponentBuffer;
 	};
 
 	class CSystem
 	{
 	public:
-		CSystem()
-			: m_entitiesCount(0)
+		CSystem(CSoaEntitiesBuffer& entitiesBuffer)
+			: m_entitiesBuffer(entitiesBuffer)
 		{
-		}
-		void InitEntitiesBuffer(const CAosEntitiesSoaArchecomponentsBinder& binder)
-		{
-			m_entitiesBuffer.Init(binder.m_vecArchecomponentType);
-			auto countToAdd = static_cast<uint32>(binder.m_vecAosEntityArchecomponentHandles.size());
-			m_entitiesBuffer.AllocAndBind(binder.m_vecAosEntityArchecomponentHandles);
-			m_entitiesCount += countToAdd;
 		}
 
-		CSoaEntitiesBuffer m_entitiesBuffer;
-		uint32 m_entitiesCount;
+		CSoaEntitiesBuffer& m_entitiesBuffer;
 	};
 }
