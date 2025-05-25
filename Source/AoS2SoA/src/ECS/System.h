@@ -5,6 +5,7 @@
 #include "ECS/ArchetypeAndFieldBindings.h"
 
 #include "ECS/Vector3.h"//未建立 ArchecomponentHandleType 与 Archetype 的绑定, 临时 include
+#include <algorithm>
 
 namespace ECS
 {
