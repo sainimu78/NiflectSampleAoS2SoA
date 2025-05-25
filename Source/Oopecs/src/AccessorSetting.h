@@ -7,4 +7,5 @@
 using namespace NiflectAccessorSetting;
 
 NIFAS_A() TSetting<OOP::CVector3Accessor, OOP::CVector3>;
-NIFAS_A() TSetting<ECS::TArchecomponentHandleAccessor<ECS::CVector3>, ECS::CVector3>;
+template <typename TInstance>
+NIFAS_A() TSetting<ECS::TArchecomponentHandleAccessor<TInstance>, ECS::CVector3>;
