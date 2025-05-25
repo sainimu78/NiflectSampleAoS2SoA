@@ -7,10 +7,6 @@ namespace ECS
 	class CNode
 	{
 	public:
-		CNode()
-			//: m_entityId(INDEX_NONE)
-		{
-		}
 		template <typename T>
 		T* InitComponent()
 		{
@@ -31,7 +27,6 @@ namespace ECS
 			return NULL;
 		}
 		Niflect::TArray<CSharedComponent> m_vecComponent;
-		//uint32 m_entityId;
 	};
 	using CSharedNode = Niflect::TSharedPtr<CNode>;
 }

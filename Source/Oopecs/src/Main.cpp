@@ -47,9 +47,9 @@ int main(int argc, char** argv)
 				vecNode.push_back(node);
 			}
 			{
-				CSoaLayoutEntitiesFieldInstance binder;
-				binder.Convert(vecNode, CArchetypeFieldRefArray().Add(&CTransformComponent::m_position));
-				sys.InitArchetypeBuffer(binder);
+				CAosSoaBinder binder;
+				binder.Bind(vecNode, CArchetypeAndFieldBindings().Add(&CTransformComponent::m_position));
+				sys.InitEntitiyBuffer(binder);
 			}
 			auto srcNode = vecNode[0].Get();
 			auto dstNode = vecNode[1].Get();
@@ -77,11 +77,11 @@ int main(int argc, char** argv)
 		}
 		CSystem sys;
 		{
-			CSoaLayoutEntitiesFieldInstance binder;
-			binder.Convert(vecNode, CArchetypeFieldRefArray()
+			CAosSoaBinder binder;
+			binder.Bind(vecNode, CArchetypeAndFieldBindings()
 				.Add(&CTransformComponent::m_position)
 				.Add(&CRigidBodyComponent::m_velocity));
-			sys.InitArchetypeBuffer(binder);
+			sys.InitEntitiyBuffer(binder);
 		}
 		for (auto& it : vecNode)
 			it->FindComponentOfType<CRigidBodyComponent>()->m_velocity.Init({ 1 });

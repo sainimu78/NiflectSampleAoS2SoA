@@ -9,11 +9,6 @@ namespace ECS
 	class CRigidBodyComponent : public CComponent
 	{
 	public:
-		//virtual void Tick(float deltaTime) override
-		//{
-		//}
-
-	public:
 		NIF_F()
 		CVector3 m_velocity;
 	};

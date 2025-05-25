@@ -1,107 +1,108 @@
 #pragma once
 #include "Niflect/NiflectType.h"
 #include "ECS/Node.h"
-#include "ECS/AosSoaBinder.h"
+#include "ECS/ArchetypeAndFieldBindings.h"
 
 namespace ECS
 {
-	using CEntityArchetypeFieldInstancesArray = Niflect::TArray<Niflect::TArray<CComponentBufferElementRef*> >;
+	using CEntitiesComponentHandles = Niflect::TArray<Niflect::TArray<CComponentHandle*> >;
 
-	class CSoaLayoutEntitiesFieldInstance
+	class CAosSoaBinder
 	{
 	public:
-		void Convert(const Niflect::TArray<CSharedNode>& vecNode, const CArchetypeFieldRefArray& soaArchetypeFieldRefArray)
+		void Bind(const Niflect::TArray<CSharedNode>& vecNode, const CArchetypeAndFieldBindings& archetypeFieldBindingArray)
 		{
-			auto archetypesCount = soaArchetypeFieldRefArray.m_vec.size();
-			for (auto& it : soaArchetypeFieldRefArray.m_vec)
-				m_vecArchetype.push_back(it.m_fieldRef);
+			auto soaComponentsCount = archetypeFieldBindingArray.m_vec.size();
+			for (auto& it : archetypeFieldBindingArray.m_vec)
+				m_vecSoaComponentArchetype.push_back(it.m_soaComponentArchetype);
 			auto entitiesCount = vecNode.size();
-			m_vecEntityArcheFieldInstances.resize(entitiesCount);
+			m_vecAosEntitySoaComponentHandles.resize(entitiesCount);
 			for (uint32 idxEntity = 0; idxEntity < entitiesCount; ++idxEntity)
 			{
 				auto entity = vecNode[idxEntity].Get();
-				auto& vecArchetypeFieldInstance = m_vecEntityArcheFieldInstances[idxEntity];
-				for (uint32 idxArchetype = 0; idxArchetype < archetypesCount; ++idxArchetype)
+				auto& vecSoaComponentHandle = m_vecAosEntitySoaComponentHandles[idxEntity];
+				for (uint32 idxComponent = 0; idxComponent < soaComponentsCount; ++idxComponent)
 				{
-					auto& fieldRefInfo = soaArchetypeFieldRefArray.m_vec[idxArchetype];
+					auto& binding = archetypeFieldBindingArray.m_vec[idxComponent];
 					for (auto& it2 : entity->m_vecComponent)
 					{
-						if (it2->GetType() == fieldRefInfo.m_ownerType)
+						if (it2->GetType() == binding.m_aosFieldOwnerType)
 						{
-							auto fieldBase = Niflect::GetOffsetAddr(it2.Get(), fieldRefInfo.m_fieldOffset);
-							auto instance = static_cast<CComponentBufferElementRef*>(fieldBase);
-							vecArchetypeFieldInstance.push_back(instance);
+							auto fieldBase = Niflect::GetOffsetAddr(it2.Get(), binding.m_aosFieldOffset);
+							auto instance = static_cast<CComponentHandle*>(fieldBase);
+							vecSoaComponentHandle.push_back(instance);
 							break;
 						}
 					}
 				}
+				ASSERT(vecSoaComponentHandle.size() == soaComponentsCount);
 			}
 		}
 
-		Niflect::TArray<Niflect::CNiflectType*> m_vecArchetype;
-		CEntityArchetypeFieldInstancesArray m_vecEntityArcheFieldInstances;
+		Niflect::TArray<Niflect::CNiflectType*> m_vecSoaComponentArchetype;
+		CEntitiesComponentHandles m_vecAosEntitySoaComponentHandles;
 	};
 
-	class CArchetypeBuffer
+	class CSoaEntityBuffer
 	{
 	public:
-		void Create(const Niflect::TArray<Niflect::CNiflectType*>& vecArchetype)
+		void Init(const Niflect::TArray<Niflect::CNiflectType*>& vecSoaComponentArchetype)
 		{
-			ASSERT(m_vecArchetypeIdxToComponentBuffer.size() == 0);
-			m_vecArchetypeIdxToComponentBuffer.resize(vecArchetype.size());
-			for (uint32 idx0 = 0; idx0 < vecArchetype.size(); ++idx0)
+			ASSERT(m_vecSoaComponentBuffer.size() == 0);
+			m_vecSoaComponentBuffer.resize(vecSoaComponentArchetype.size());
+			for (uint32 idx0 = 0; idx0 < vecSoaComponentArchetype.size(); ++idx0)
 			{
-				auto& buffer = m_vecArchetypeIdxToComponentBuffer[idx0];
-				buffer.Init(vecArchetype[idx0]);
+				auto& buffer = m_vecSoaComponentBuffer[idx0];
+				buffer.Init(vecSoaComponentArchetype[idx0]);
 			}
 		}
-		void AllocAndBind(const CEntityArchetypeFieldInstancesArray& vecEntityArcheFieldInstances)
+		void AllocAndBind(const CEntitiesComponentHandles& vecAosEntitySoaComponentHandles)
 		{
-			auto archetypesCount = m_vecArchetypeIdxToComponentBuffer.size();
+			auto soaComponentsCount = m_vecSoaComponentBuffer.size();
 
-			Niflect::TArray<uint32> vecArchetypeIdxToOldEntitiesCount;
-			for (auto& it : m_vecArchetypeIdxToComponentBuffer)
-				vecArchetypeIdxToOldEntitiesCount.push_back(it.GetEntitiesCount());
+			Niflect::TArray<uint32> vecComponentIdxToOldEntitiesCount;
+			for (auto& it : m_vecSoaComponentBuffer)
+				vecComponentIdxToOldEntitiesCount.push_back(it.GetEntitiesCount());
 
-			uint32 countToAdd = static_cast<uint32>(vecEntityArcheFieldInstances.size());
-			for (uint32 idx0 = 0; idx0 < archetypesCount; ++idx0)
+			uint32 countToAdd = static_cast<uint32>(vecAosEntitySoaComponentHandles.size());
+			for (uint32 idx0 = 0; idx0 < soaComponentsCount; ++idx0)
 			{
-				auto& buffer = m_vecArchetypeIdxToComponentBuffer[idx0];
+				auto& buffer = m_vecSoaComponentBuffer[idx0];
 				auto oldCount = buffer.GetEntitiesCount();
 				buffer.Alloc(countToAdd);
 			}
-			for (uint32 idxEntity = 0; idxEntity < vecEntityArcheFieldInstances.size(); ++idxEntity)
+			for (uint32 idxEntity = 0; idxEntity < vecAosEntitySoaComponentHandles.size(); ++idxEntity)
 			{
-				auto& vecArchetypeFieldInstance = vecEntityArcheFieldInstances[idxEntity];
-				ASSERT(archetypesCount == vecArchetypeFieldInstance.size());
-				for (uint32 idxArchetype = 0; idxArchetype < archetypesCount; ++idxArchetype)
+				auto& vecSoaComponentHandle = vecAosEntitySoaComponentHandles[idxEntity];
+				ASSERT(soaComponentsCount == vecSoaComponentHandle.size());
+				for (uint32 componentIdx = 0; componentIdx < soaComponentsCount; ++componentIdx)
 				{
-					auto& it1 = vecArchetypeFieldInstance[idxArchetype];
-					auto& buffer = m_vecArchetypeIdxToComponentBuffer[idxArchetype];
-					auto& offset = vecArchetypeIdxToOldEntitiesCount[idxArchetype];
-					it1->InitRef(this, idxArchetype, offset + buffer.m_type->GetTypeSize() * idxEntity);
+					auto& it1 = vecSoaComponentHandle[componentIdx];
+					auto& buffer = m_vecSoaComponentBuffer[componentIdx];
+					auto& offset = vecComponentIdxToOldEntitiesCount[componentIdx];
+					it1->InitHandle(this, componentIdx, offset + buffer.m_archetype->GetTypeSize() * idxEntity);
 				}
 			}
 		}
 		template <typename T>
-		T* GetMutableComponentBase(uint32 archetypeIdx)
+		T* GetMutableComponentBase(uint32 componentIdx)
 		{
-			auto& buffer = m_vecArchetypeIdxToComponentBuffer[archetypeIdx];
+			auto& buffer = m_vecSoaComponentBuffer[componentIdx];
 			auto base = buffer.m_bytes.data();
-			ASSERT(buffer.m_type == Niflect::StaticGetType<T>());
+			ASSERT(buffer.m_archetype == Niflect::StaticGetType<T>());
 			return reinterpret_cast<T*>(base);
 		}
 		template <typename T>
-		const T* GetComponentBase(uint32 archetypeIdx) const
+		const T* GetComponentBase(uint32 componentIdx) const
 		{
-			auto& buffer = m_vecArchetypeIdxToComponentBuffer[archetypeIdx];
+			auto& buffer = m_vecSoaComponentBuffer[componentIdx];
 			auto base = buffer.m_bytes.data();
-			ASSERT(buffer.m_type == Niflect::StaticGetType<T>());
+			ASSERT(buffer.m_archetype == Niflect::StaticGetType<T>());
 			return reinterpret_cast<const T*>(base);
 		}
 
 	public:
-		Niflect::TArray<CComponentBuffer> m_vecArchetypeIdxToComponentBuffer;
+		Niflect::TArray<CComponentBuffer> m_vecSoaComponentBuffer;
 	};
 
 	class CSystem
@@ -111,15 +112,15 @@ namespace ECS
 			: m_entitiesCount(0)
 		{
 		}
-		void InitArchetypeBuffer(const CSoaLayoutEntitiesFieldInstance& binder)
+		void InitEntitiyBuffer(const CAosSoaBinder& binder)
 		{
-			m_archetypeBuffer.Create(binder.m_vecArchetype);
-			auto countToAdd = static_cast<uint32>(binder.m_vecEntityArcheFieldInstances.size());
-			m_archetypeBuffer.AllocAndBind(binder.m_vecEntityArcheFieldInstances);
+			m_entityBuffer.Init(binder.m_vecSoaComponentArchetype);
+			auto countToAdd = static_cast<uint32>(binder.m_vecAosEntitySoaComponentHandles.size());
+			m_entityBuffer.AllocAndBind(binder.m_vecAosEntitySoaComponentHandles);
 			m_entitiesCount += countToAdd;
 		}
 
-		CArchetypeBuffer m_archetypeBuffer;
+		CSoaEntityBuffer m_entityBuffer;
 		uint32 m_entitiesCount;
 	};
 }

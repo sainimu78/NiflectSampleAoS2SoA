@@ -1,7 +1,6 @@
 #pragma once
-#include "Niflect/Base/SharedPtr.h"
 #include "Niflect/NiflectType.h"
-#include "ECS/AosSoaBinder.h"
+#include "ECS/ArchetypeAndFieldBindings.h"
 
 namespace ECS
 {
@@ -39,21 +38,25 @@ namespace ECS
 	{
 	public:
 		CComponentBuffer()
-			: m_type(NULL)
+			: m_archetype(NULL)
 			, m_entitiesCount(0)
 		{
 		}
-		void Init(Niflect::CNiflectType* type)
+		~CComponentBuffer()
 		{
-			m_type = type;
+			this->DestroyAll();
+		}
+		void Init(Niflect::CNiflectType* archetype)
+		{
+			m_archetype = archetype;
 		}
 		void Alloc(uint32 countToAdd)
 		{
-			auto& size = m_type->GetTypeSize();
+			auto& size = m_archetype->GetTypeSize();
 			auto newCount = m_entitiesCount + countToAdd;
 			auto newSize = size * newCount;
 			m_bytes.resize(newSize);
-			auto& ctorInfo = m_type->m_vecConstructorInfo[0];
+			auto& ctorInfo = m_archetype->m_vecConstructorInfo[0];
 			ASSERT(ctorInfo.m_vecInput.size() == 0);
 			for (uint32 idx = m_entitiesCount; idx < newCount; ++idx)
 				ctorInfo.m_Func(this->GetData(size * idx), NULL);
@@ -61,25 +64,12 @@ namespace ECS
 		}
 		void Free(uint32 countToDelete)
 		{
-			auto& size = m_type->GetTypeSize();
 			auto newCount = m_entitiesCount - countToDelete;
+			auto& size = m_archetype->GetTypeSize();
 			auto newSize = size * newCount;
-			auto& DtorFunc = m_type->m_InvokeDestructorFunc;
-			for (uint32 idx = newCount; idx < m_entitiesCount; ++idx)
-				DtorFunc(this->GetData(size * idx));
+			this->Destroy(newCount, m_entitiesCount);
 			m_bytes.resize(newSize);
 			m_entitiesCount = newCount;
-		}
-		void Destroy(uint32 start, uint32 count)
-		{
-			auto& size = m_type->GetTypeSize();
-			auto& DtorFunc = m_type->m_InvokeDestructorFunc;
-			for (uint32 idx = start; idx < start + count; ++idx)
-				DtorFunc(this->GetData(size * idx));
-		}
-		void DestroyAll()
-		{
-			this->Destroy(0, m_entitiesCount);
 		}
 		uint32 GetEntitiesCount() const
 		{
@@ -87,13 +77,24 @@ namespace ECS
 		}
 
 	private:
+		void Destroy(uint32 start, uint32 end)
+		{
+			auto& size = m_archetype->GetTypeSize();
+			auto& DtorFunc = m_archetype->m_InvokeDestructorFunc;
+			for (uint32 idx = start; idx < end; ++idx)
+				DtorFunc(this->GetData(size * idx));
+		}
+		void DestroyAll()
+		{
+			this->Destroy(0, m_entitiesCount);
+		}
 		void* GetData(uint32 offset)
 		{
 			return static_cast<void*>(&m_bytes[offset]);
 		}
 
 	public:
-		Niflect::CNiflectType* m_type;
+		Niflect::CNiflectType* m_archetype;
 		Niflect::TArray<uint8> m_bytes;
 		uint32 m_entitiesCount;
 	};

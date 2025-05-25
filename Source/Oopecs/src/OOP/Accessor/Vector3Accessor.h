@@ -16,3 +16,17 @@ namespace OOP
 		virtual bool LoadInstanceImpl(InstanceType* base, const CRwNode* rw) const override;
 	};
 }
+
+namespace RwOverloads
+{
+	using namespace RwTree;
+
+	static void SaveToRwNode(const OOP::CVector3& vec, CRwNode* rw)
+	{
+		OOP::SaveCVector3ToRwNode(vec, rw);
+	}
+	static void LoadFromRwNode(const CRwNode* rw, OOP::CVector3& vec)
+	{
+		OOP::LoadCVector3FromRwNode(rw, vec);
+	}
+}
