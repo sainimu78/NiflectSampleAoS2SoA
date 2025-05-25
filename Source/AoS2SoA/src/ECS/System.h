@@ -56,7 +56,7 @@ namespace ECS
 								ASSERT(soaArchetypeSpecified != NULL);
 								auto aosFieldOwnerType = it0;
 								auto aosOffsetSpecified = it1.GetOffset();
-								bindings.Add2({ soaArchetypeSpecified, aosFieldOwnerType, aosOffsetSpecified });
+								bindings.Add({ soaArchetypeSpecified, aosFieldOwnerType, aosOffsetSpecified });
 								break;
 							}
 						}
