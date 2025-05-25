@@ -83,14 +83,12 @@ int main(int argc, char** argv)
 				.Add(&CRigidBodyComponent::m_velocity));
 			sys.InitArchetypeBuffer(binder);
 		}
-		auto velocities = sys.m_archetypeBuffer.GetMutableComponentBase<ECS::CVector3::RefType>(ToIndex(EMovementComponentIndex::Velocity));
-		for (uint32 idx = 0; idx < sys.m_entitiesCount; ++idx)
-			velocities[idx] = 1;
+		for (auto& it : vecNode)
+			it->FindComponentOfType<CRigidBodyComponent>()->m_velocity.Init({ 1 });
 		for (uint32 idx = 0; idx < simTimes; ++idx)
 			SimulateMovement(sys, deltaTime);
-		auto positions = sys.m_archetypeBuffer.GetComponentBase<ECS::CVector3::RefType>(ToIndex(EMovementComponentIndex::Position));
-		for (uint32 idx = 0; idx < sys.m_entitiesCount; ++idx)
-			vecResultPosition.push_back(positions[idx]);
+		for (auto& it : vecNode)
+			vecResultPosition.push_back(it->FindComponentOfType<CTransformComponent>()->m_position.Get());
 	}
 	auto expected = simTimes * deltaTime;
 	for (auto& it : vecResultPosition)
