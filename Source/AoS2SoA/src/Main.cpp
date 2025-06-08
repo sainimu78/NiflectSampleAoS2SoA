@@ -9,8 +9,8 @@ using namespace Niflect;
 
 int main(int argc, char** argv)
 {
-	auto reg = GetModuleRegistry();
-	reg->InitRegisteredModules();
+	CNiflectModuleRegistry2 reg;
+	reg.InitLoadTimeModules();
 	const uint32 simTimes = 1000;
 	const float deltaTime = 1 / 60.0f;
 	const uint32 nodesCount = 5;
