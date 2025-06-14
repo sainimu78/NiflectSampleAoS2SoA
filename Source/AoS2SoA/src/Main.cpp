@@ -9,7 +9,7 @@ using namespace Niflect;
 
 int main(int argc, char** argv)
 {
-	CNiflectModuleRegistry2 reg;
+	CNiflectModuleRegistry reg;
 	reg.InitLoadTimeModules();
 	const uint32 simTimes = 1000;
 	const float deltaTime = 1 / 60.0f;
