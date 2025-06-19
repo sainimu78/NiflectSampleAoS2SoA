@@ -59,10 +59,10 @@ int main(int argc, char** argv)
 			auto& src = srcNode->FindComponentOfType<CTransformComponent>()->m_position;
 			src.Init({ 1, 2, 3 });
 			CRwNode rw;
-			type->SaveInstanceToRwNode(&src, &rw);
+			SaveInstanceToRwNode(type, &src, &rw);
 			ASSERT(rw.IsValue());
 			auto& dst = dstNode->FindComponentOfType<CTransformComponent>()->m_position;
-			type->LoadInstanceFromRwNode(&dst, &rw);
+			LoadInstanceFromRwNode(type, &dst, &rw);
 			auto& srcRef = src.Get();
 			auto& dstRef = dst.Get();
 			ASSERT(srcRef.m_x == dstRef.m_x);

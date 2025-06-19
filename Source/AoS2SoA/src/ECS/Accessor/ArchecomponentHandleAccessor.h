@@ -7,17 +7,17 @@ namespace ECS
 	using namespace RwTree;
 
 	template <typename THandle>
-	class TArchecomponentHandleAccessor : public Niflect::CNiflectAccessor
+	class TArchecomponentHandleAccessor : public Niflect::CAccessor
 	{
 		typedef typename THandle::TArchetype TArchetype;
 	protected:
-		virtual bool SaveInstanceImpl(const InstanceType* base, CRwNode* rw) const override
+		virtual bool SaveImpl(const InstanceType* base, CRwNode* rw) const override
 		{
 			auto& instance = *static_cast<const TArchetype*>(base);
 			RwOverloads::SaveToRwNode(instance, rw);
 			return true;
 		}
-		virtual bool LoadInstanceImpl(InstanceType* base, const CRwNode* rw) const override
+		virtual bool LoadImpl(InstanceType* base, const CRwNode* rw) const override
 		{
 			auto& instance = *static_cast<TArchetype*>(base);
 			ASSERT(rw->IsValue());

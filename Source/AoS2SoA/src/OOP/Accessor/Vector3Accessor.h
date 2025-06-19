@@ -1,5 +1,5 @@
 #pragma once
-#include "Niflect/NiflectAccessor.h"
+#include "Niflect/Default/Accessor.h"
 #include "OOP/Vector3.h"
 
 namespace OOP
@@ -9,11 +9,11 @@ namespace OOP
 	void SaveCVector3ToRwNode(const CVector3& vec, CRwNode* rw);
 	void LoadCVector3FromRwNode(const CRwNode* rw, CVector3& vec);
 
-	class CVector3Accessor : public Niflect::CNiflectAccessor
+	class CVector3Accessor : public Niflect::CAccessor
 	{
 	protected:
-		virtual bool SaveInstanceImpl(const InstanceType* base, CRwNode* rw) const override;
-		virtual bool LoadInstanceImpl(InstanceType* base, const CRwNode* rw) const override;
+		virtual bool SaveImpl(const InstanceType* base, CRwNode* rw) const override;
+		virtual bool LoadImpl(InstanceType* base, const CRwNode* rw) const override;
 	};
 }
 
