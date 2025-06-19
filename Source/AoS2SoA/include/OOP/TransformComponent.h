@@ -1,5 +1,5 @@
 #pragma once
-#include "Niflect/Default/DefaultMacroTag.h"
+#include "Niflect/Component/DefaultMacroTag.h"
 #include "OOP/Component.h"
 #include "OOP/Vector3.h"
 #include "OOP/RigidBodyComponent.h"

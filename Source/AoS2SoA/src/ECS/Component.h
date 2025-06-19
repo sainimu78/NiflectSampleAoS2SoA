@@ -1,5 +1,6 @@
 #pragma once
 #include "Niflect/NiflectType.h"
+#include "Niflect/Base/Set.h"
 
 namespace ECS
 {

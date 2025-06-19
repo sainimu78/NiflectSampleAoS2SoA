@@ -1,6 +1,6 @@
 #pragma once
 #include "ECS/System.h"
-#include "Niflect/Default/DefaultMacroTag.h"
+#include "Niflect/Component/DefaultMacroTag.h"
 
 namespace ECS
 {

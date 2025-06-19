@@ -1,5 +1,4 @@
 #pragma once
-#include "Niflect/Default/DefaultMacroTag.h"
 #include "OOP/Vector3_gen.h"
 
 namespace OOP

@@ -1,5 +1,5 @@
 #pragma once
-#include "Niflect/Default/DefaultAccessorSetting.h"
+#include "Niflect/Component/RwTree/Accessor/DefaultRwAccessorSetting.h"
 #include "OOP/Accessor/Vector3Accessor.h"
 #include "ECS/Accessor/ArchecomponentHandleAccessor.h"
 #include "ECS/Vector3.h"
