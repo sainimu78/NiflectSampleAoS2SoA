@@ -7,7 +7,7 @@ namespace ECS
 	using namespace RwTree;
 
 	template <typename THandle>
-	class TArchecomponentHandleAccessor : public Niflect::CRwAccessor
+	class TArchecomponentHandleAccessor : public CRwAccessor
 	{
 		typedef typename THandle::TArchetype TArchetype;
 	protected:

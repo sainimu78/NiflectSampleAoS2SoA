@@ -9,7 +9,7 @@ namespace OOP
 	void SaveCVector3ToRwNode(const CVector3& vec, CRwNode* rw);
 	void LoadCVector3FromRwNode(const CRwNode* rw, CVector3& vec);
 
-	class CVector3Accessor : public Niflect::CRwAccessor
+	class CVector3Accessor : public CRwAccessor
 	{
 	protected:
 		virtual bool SaveImpl(const InstanceType* base, CRwNode* rw) const override;
