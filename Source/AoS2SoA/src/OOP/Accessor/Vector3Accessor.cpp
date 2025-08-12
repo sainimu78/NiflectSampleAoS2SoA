@@ -1,5 +1,5 @@
 #include "OOP/Accessor/Vector3Accessor.h"
-#include "Niflect/Util/StringUtil.h"
+#include "Niflect/Component/Util/StringUtil.h"
 
 namespace OOP
 {
