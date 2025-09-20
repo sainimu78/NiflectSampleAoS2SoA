@@ -12,8 +12,13 @@ namespace OOP
 	class CVector3Accessor : public CRwAccessor
 	{
 	protected:
+#ifdef NIFLECTDEV_DECOUPLING_ACCESSOR_AND_TYPE
+		virtual bool SaveImpl(Niflect::CNiflectType* type, const Niflect::InstanceType* base, CRwNode* rw) const override;
+		virtual bool LoadImpl(Niflect::CNiflectType* type, Niflect::InstanceType* base, const CRwNode* rw) const override;
+#else
 		virtual bool SaveImpl(const InstanceType* base, CRwNode* rw) const override;
 		virtual bool LoadImpl(InstanceType* base, const CRwNode* rw) const override;
+#endif
 	};
 }
 

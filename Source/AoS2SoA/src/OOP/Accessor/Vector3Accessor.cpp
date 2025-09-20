@@ -17,13 +17,21 @@ namespace OOP
 		vec.m_z = std::stof(vecEntryStr[2].c_str());
 	}
 
+#ifdef NIFLECTDEV_DECOUPLING_ACCESSOR_AND_TYPE
+	bool CVector3Accessor::SaveImpl(Niflect::CNiflectType* type, const Niflect::InstanceType* base, CRwNode* rw) const
+#else
 	bool CVector3Accessor::SaveImpl(const InstanceType* base, CRwNode* rw) const
+#endif
 	{
 		auto& instance = *static_cast<const CVector3*>(base);
 		SaveCVector3ToRwNode(instance, rw);//表明可任意编解码
 		return true;
 	}
+#ifdef NIFLECTDEV_DECOUPLING_ACCESSOR_AND_TYPE
+	bool CVector3Accessor::LoadImpl(Niflect::CNiflectType* type, Niflect::InstanceType* base, const CRwNode* rw) const
+#else
 	bool CVector3Accessor::LoadImpl(InstanceType* base, const CRwNode* rw) const
+#endif
 	{
 		auto& instance = *static_cast<CVector3*>(base);
 		ASSERT(rw->IsValue());
