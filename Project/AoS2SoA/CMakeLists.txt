@@ -8,6 +8,7 @@ include(${c_RootCMakeProjectFrameworkDirPath}/ProjectBegin.cmake)
 project(${c_ProjectName})
 include(${c_RootCMakeProjectFrameworkDirPath}/ProjectEnd.cmake)
 
+include(${c_RootCMakeProjectFrameworkDirPath}/InitCMakeTargetOutputDirPaths.cmake)
 
 set(ModuleName ${c_ProjectName})
 
@@ -43,9 +44,11 @@ set(v_EnabledLoadTimeModuleRegistrar TRUE)
 #set(v_EnabledDebuggerAttaching TRUE)
 include(${c_RootProjectDirPath}/Niflect/Default.cmake)
 
+include(${c_ProjectDirPath}/Install.cmake)
+
 if(MSVC)
 	set_target_properties(${ModuleName} PROPERTIES
-		VS_DEBUGGER_WORKING_DIRECTORY "$<IF:$<CONFIG:Debug>,${CMAKE_RUNTIME_OUTPUT_DIRECTORY_DEBUG},${CMAKE_RUNTIME_OUTPUT_DIRECTORY_RELEASE}>"
+		VS_DEBUGGER_WORKING_DIRECTORY "$<IF:$<CONFIG:Debug>,${c_ProjectBinDirPathDebug},${c_ProjectBinDirPathRelease}>"
 	)
 endif()
 
